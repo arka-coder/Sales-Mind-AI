@@ -11,7 +11,7 @@ from pathlib import Path
 
 import chromadb
 from chromadb.config import Settings as ChromaSettings
-from sentence_transformers import SentenceTransformer
+from chromadb.utils.embedding_functions import DefaultEmbeddingFunction
 
 from config import settings
 
@@ -145,13 +145,15 @@ class VectorStore:
                 path=settings.CHROMA_PERSIST_DIR
             )
             
+            # Use ChromaDB's built-in ONNX embedding function (all-MiniLM-L6-v2)
+            # This avoids pulling in PyTorch (~1.8GB) — uses onnxruntime instead
+            self._embedder = DefaultEmbeddingFunction()
+
             self._collection = self._client.get_or_create_collection(
                 name=settings.CHROMA_COLLECTION_NAME,
-                metadata={"hnsw:space": "cosine"}
+                metadata={"hnsw:space": "cosine"},
+                embedding_function=self._embedder
             )
-            
-            # Use a lightweight but effective model
-            self._embedder = SentenceTransformer("all-MiniLM-L6-v2")
             
             logger.info(f"VectorStore initialized. Collection has {self._collection.count()} documents.")
         except Exception as e:
@@ -160,7 +162,7 @@ class VectorStore:
 
     def embed(self, texts: List[str]) -> List[List[float]]:
         """Generate embeddings for a list of texts."""
-        return self._embedder.encode(texts, convert_to_numpy=True).tolist()
+        return self._embedder(texts)
 
     def add_chunks(self, chunks: List[Dict], document_id: str) -> int:
         """Add document chunks to vector store."""

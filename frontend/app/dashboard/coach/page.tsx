@@ -110,7 +110,7 @@ export default function CoachPage() {
         context: `ROLEPLAY MODE: You are roleplaying as: ${selectedPersona.label}. ${selectedPersona.systemHint}. Respond in character as the buyer. Keep responses concise (2-4 sentences). After your buyer response, on a new line starting with COACH_TIP: give a short coaching tip for the salesperson.`,
       };
 
-      const res  = await fetch('http://localhost:8000/api/chat/message', {
+      const res  = await fetch('/api/chat/message', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),

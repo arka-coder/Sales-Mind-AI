@@ -11,6 +11,8 @@ services:
   - type: web
     name: salesmind-api
     runtime: python
+    # Pin to Python 3.11 — pydantic-core has no Python 3.14 wheels yet
+    # Render also reads runtime.txt in the root directory
     region: oregon   # Change to: ohio, virginia, frankfurt, singapore, or ohio
     plan: free        # Change to: starter ($7/mo) for always-on + no cold starts
 

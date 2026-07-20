@@ -2,6 +2,7 @@ from pydantic_settings import BaseSettings
 from functools import lru_cache
 from pydantic import Field
 from typing import List
+import os
 
 
 class Settings(BaseSettings):
@@ -9,6 +10,9 @@ class Settings(BaseSettings):
     APP_NAME: str = "SalesMind AI"
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = False
+
+    # Server — Render injects PORT automatically
+    PORT: int = 8000
 
     # Groq AI
     GROQ_API_KEY: str = ""
@@ -21,7 +25,8 @@ class Settings(BaseSettings):
     SUPABASE_SERVICE_KEY: str = Field(default="", validation_alias="SUPABASE_SERVICE_ROLE_KEY")
 
     # ChromaDB
-    CHROMA_PERSIST_DIR: str = "./chroma_db"
+    # Render free tier: use /tmp (ephemeral). Paid tier: mount a disk at /data
+    CHROMA_PERSIST_DIR: str = os.environ.get("CHROMA_PERSIST_DIR", "/tmp/chroma_db")
     CHROMA_COLLECTION_NAME: str = "salesmind_knowledge"
 
     # ElevenLabs

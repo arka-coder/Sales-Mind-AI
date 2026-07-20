@@ -13,3 +13,14 @@ env/
 .pytest_cache/
 coverage/
 .DS_Store
+
+# Protect real secrets — use .env.example as the template
+backend/.env
+frontend/.env.local
+
+# Render / Vercel generated files
+.vercel/
+
+# Python build artifacts
+*.egg-info/
+.eggs/

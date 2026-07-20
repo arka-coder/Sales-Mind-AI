@@ -1,0 +1,72 @@
+# Render deployment configuration for SalesMind AI backend
+# Docs: https://render.com/docs/render-yaml-spec
+#
+# Usage:
+#  1. Push this repo to GitHub
+#  2. In Render dashboard → New → Blueprint → select this repo
+#  3. Render reads this file and creates the service automatically
+#  4. Set all required env vars in Render → Environment
+
+services:
+  - type: web
+    name: salesmind-api
+    runtime: python
+    region: oregon   # Change to: ohio, virginia, frankfurt, singapore, or ohio
+    plan: free        # Change to: starter ($7/mo) for always-on + no cold starts
+
+    # Build command — installs all Python dependencies
+    buildCommand: pip install -r requirements.txt
+
+    # Start command — Render injects $PORT automatically
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+
+    # Health check — Render pings this to confirm the service is up
+    healthCheckPath: /api/health
+
+    # Render will restart the service if it crashes
+    autoDeploy: true
+
+    # Environment variables — set values in Render dashboard
+    # (Do NOT put real secrets in this file — it goes into Git)
+    envVars:
+      - key: APP_NAME
+        value: SalesMind AI
+      - key: APP_VERSION
+        value: 1.0.0
+      - key: DEBUG
+        value: false
+      - key: CHROMA_PERSIST_DIR
+        value: /tmp/chroma_db
+
+      # ── Set these in Render Dashboard → Environment ──────────────────────────
+      - key: GROQ_API_KEY
+        sync: false   # prompt in dashboard
+
+      - key: OPENAI_API_KEY
+        sync: false
+
+      - key: ELEVENLABS_API_KEY
+        sync: false
+
+      - key: ELEVENLABS_VOICE_ID
+        sync: false
+
+      - key: SUPABASE_URL
+        sync: false
+
+      - key: SUPABASE_ANON_KEY
+        sync: false
+
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+
+      - key: RESEND_API_KEY
+        sync: false
+
+      - key: SECRET_KEY
+        generateValue: true   # Render auto-generates a secure random value
+
+      # Add your Vercel frontend URL here after first deploy
+      # Example: https://salesmind.vercel.app
+      - key: ALLOWED_ORIGINS
+        value: http://localhost:3000
